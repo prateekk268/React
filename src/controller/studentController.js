@@ -1,10 +1,17 @@
 const result = require("../model/studentModel")
+const _= require("lodash")
 
 
-// add data // update Data
 exports.addDataUpdateData = async (req,res) => {
     try{
         let {Name , Subject, Marks} = req.body
+        if(_.isNil(Name)) {
+            throw new Error("Name is missing");
+        }
+        if(_.isNil(Subject)) throw new Error("Subject is missing");
+        if(_.isNil(Marks)) throw new Error("Marks is missing");
+
+        
         let check = await result.findOne({
             where : { Name : Name , Subject : Subject},
         });
@@ -23,8 +30,38 @@ exports.addDataUpdateData = async (req,res) => {
         }
 
     }catch(err){
-        console.log(err)
-        return res.status(500).send({status : false, err : err.message})
+        // console.log(err)
+        switch(err.message){
+            case "Name is missing":
+                res.json({
+                    status : false,
+                    error : "Name is a mandatory field"
+                })
+                break;
+            
+
+            case "Subject is missing": 
+                res.json({
+                    status : false,
+                    error : "Subject is a mandatory feild"
+                })
+                break;
+
+            case "Marks is missing":
+                res.json({
+                    status :false, 
+                    error : "Marks is a mandatory feild"
+                })
+                break;
+
+            default :
+            res.json({
+                status :false,
+                error : err.message
+            })
+
+            
+        }
     }
 }
 
